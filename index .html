@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鮮雞蛋訂購單</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.78);
+            --glass-border: rgba(255, 255, 255, 0.45);
+            --accent-red: #d96c4d;
+        }
+
+        * { box-sizing: border-box; }
+
+        body, html {
+            min-height: 100%;
+            margin: 0;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        /* ✅ 修正：改用 pseudo-element 固定背景，相容 iOS Safari */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            /* ✅ 修正：副檔名改為 .png */
+            background: url('2222.png') no-repeat center center;
+            background-size: cover;
+            z-index: -1;
+        }
+
+        body {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 磨砂玻璃 */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.45);
+            border: 2px solid transparent;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .option-btn.selected {
+            background: white;
+            border-color: var(--accent-red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(217, 108, 77, 0.2);
+        }
+
+        .qty-btn {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            cursor: pointer;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            padding: 0.75rem 0;
+            flex: 1;
+        }
+
+        .qty-btn:hover { background: rgba(255,255,255,0.85); }
+
+        .qty-btn.selected {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        .title-font {
+            font-family: 'Zhi Mang Xing', cursive;
+        }
+
+        /* toast 通知 */
+        #toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #333;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            transition: transform 0.3s ease;
+            z-index: 999;
+            white-space: nowrap;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        input {
+            width: 100%;
+            background: rgba(255,255,255,0.65);
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            outline: none;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 1rem;
+            transition: box-shadow 0.2s;
+        }
+        input:focus {
+            box-shadow: 0 0 0 3px rgba(217, 108, 77, 0.25);
+            background: rgba(255,255,255,0.9);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 主要訂購面板 -->
+    <div class="glass-panel w-full max-w-xl p-6 md:p-10 overflow-y-auto" style="max-height: 92vh;">
+
+        <header class="text-center mb-8">
+            <h1 class="text-5xl title-font text-gray-800 mb-2">鮮雞蛋訂購單</h1>
+            <p class="text-xs tracking-widest text-gray-500 font-bold uppercase">Fresh Organic Eggs · Order Form</p>
+        </header>
+
+        <div class="space-y-7">
+
+            <!-- 1. 種類 -->
+            <section>
+                <p class="font-bold text-gray-700 mb-3 text-base">● 選擇種類</p>
+                <div class="grid gap-3">
+                    <button onclick="selectType('A', 200, '有機白殼蛋 4斤裝')" id="type-A" class="option-btn p-4 rounded-xl flex justify-between items-center">
+                        <span class="font-medium text-gray-800">A. 有機白殼蛋 4斤裝</span>
+                        <span class="font-bold text-orange-700">NT$ 200</span>
+                    </button>
+                    <button onclick="selectType('B', 250, '有機紅殼蛋 3.5斤裝')" id="type-B" class="option-btn p-4 rounded-xl flex justify-between items-center">
+                        <span class="font-medium text-gray-800">B. 有機紅殼蛋 3.5斤裝</span>
+                        <span class="font-bold text-orange-700">NT$ 250</span>
+                    </button>
+                    <button onclick="selectType('C', 250, '有機土雞蛋 3斤裝')" id="type-C" class="option-btn p-4 rounded-xl flex justify-between items-center">
+                        <span class="font-medium text-gray-800">C. 有機土雞蛋 3斤裝</span>
+                        <span class="font-bold text-orange-700">NT$ 250</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 2. 數量 -->
+            <section>
+                <p class="font-bold text-gray-700 mb-3 text-base">● 訂購盒數</p>
+                <div class="flex gap-2">
+                    <button onclick="setQty(1)" class="qty-btn">1</button>
+                    <button onclick="setQty(2)" class="qty-btn">2</button>
+                    <button onclick="setQty(3)" class="qty-btn">3</button>
+                    <button onclick="setQty(4)" class="qty-btn">4</button>
+                    <button onclick="setQty(5)" class="qty-btn">5</button>
+                </div>
+            </section>
+
+            <!-- 3. 總金額 -->
+            <div class="rounded-2xl p-5 text-center border-2 border-white" style="background: rgba(255,255,255,0.5);">
+                <p class="text-sm text-gray-600 font-bold tracking-wider">總計金額</p>
+                <p class="text-5xl font-black text-red-600 mt-1">
+                    <small class="text-xl">NT$</small> <span id="total-price">0</span>
+                </p>
+            </div>
+
+            <!-- 4. 填寫資料 -->
+            <section class="space-y-3">
+                <p class="font-bold text-gray-700 text-base">● 收件資料</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" id="name" placeholder="收件人姓名">
+                    <input type="tel" id="phone" placeholder="連絡電話">
+                </div>
+                <input type="email" id="email" placeholder="Gmail 地址（訂單確認用）">
+
+                <button onclick="sendOrder()"
+                    class="w-full text-white font-bold py-4 rounded-xl text-xl shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                    style="background: var(--accent-red);">
+                    ✉ 確認訂購（發送郵件）
+                </button>
+
+                <!-- ✅ 新增：mailto 備用說明 -->
+                <p class="text-center text-xs text-gray-500 leading-relaxed">
+                    點擊後會開啟您的郵件程式。若未自動開啟，<br>
+                    請直接 Email 至 <strong>owen163@gmail.com</strong> 完成訂購。
+                </p>
+            </section>
+
+            <!-- 5. 底部資訊 -->
+            <footer class="pt-5 border-t border-gray-200 text-center">
+                <p class="text-gray-800 font-bold text-lg">鮮雞蛋行</p>
+                <p class="text-gray-600 text-sm">服務專線：0912-345-678</p>
+                <div class="mt-4 flex flex-col items-center gap-1">
+                    <a href="https://line.me" target="_blank" class="block bg-white p-2 rounded-xl shadow-sm hover:shadow-md transition">
+                        <!-- QR Code SVG placeholder -->
+                        <svg class="w-20 h-20 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm15 0h3v2h-3v-2zm-2 2h2v2h-2v-2zm2 2h3v2h-3v-2zm-2 2h2v2h-2v-2zm2-2h-2v-2h2v2zm0-2h2v2h-2v-2zM7 5v4h4V5H7zm10 0v4h4V5h-4zM7 15v4h4v-4H7z"/>
+                        </svg>
+                    </a>
+                    <span class="text-xs text-gray-500">掃描 QR 碼加 LINE 好友</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div id="toast"></div>
+
+    <script>
+        let currentPrice = 0;
+        let currentName = "";
+        let currentQty = 1;
+
+        function selectType(id, price, name) {
+            currentPrice = price;
+            currentName = name;
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('type-' + id).classList.add('selected');
+            updateTotal();
+        }
+
+        function setQty(q) {
+            currentQty = q;
+            document.querySelectorAll('.qty-btn').forEach((btn, idx) => {
+                btn.classList.toggle('selected', idx + 1 === q);
+            });
+            updateTotal();
+        }
+
+        function updateTotal() {
+            document.getElementById('total-price').textContent =
+                (currentPrice * currentQty).toLocaleString('zh-TW');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function sendOrder() {
+            const name  = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!currentPrice)         { showToast('⚠️ 請選擇雞蛋種類'); return; }
+            if (!name || !phone || !email) { showToast('⚠️ 請填妥姓名、電話及 Gmail'); return; }
+
+            // 基本 email 格式驗證
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showToast('⚠️ Email 格式不正確'); return;
+            }
+
+            const total   = currentPrice * currentQty;
+            const subject = encodeURIComponent(`【新訂單】鮮雞蛋訂購 - ${name}`);
+            const body    = encodeURIComponent(
+                `您好，以下是來自網頁的訂購資訊：\n\n` +
+                `訂購人：${name}\n` +
+                `電話：${phone}\n` +
+                `回覆 Email：${email}\n` +
+                `─────────────────\n` +
+                `訂購種類：${currentName}\n` +
+                `訂購盒數：${currentQty} 盒\n` +
+                `應付總額：NT$ ${total.toLocaleString('zh-TW')}\n\n` +
+                `請盡速處理並回覆客戶，謝謝！`
+            );
+
+            window.location.href = `mailto:owen163@gmail.com?subject=${subject}&body=${body}`;
+        }
+
+        // 預設選中數量 1
+        window.onload = () => setQty(1);
+    </script>
+</body>
+</html>
