@@ -8,7 +8,7 @@
    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.45);
             --accent-red: #d96c4d;
         }
@@ -32,13 +32,7 @@
             background-size: cover;
             z-index: -1;
         }
-        /* 當螢幕寬度小於 768px 時（手機） */
-@media (max-width: 768px) {
-    body::before {
-        background-size: 50% auto;  /* 手機版縮小一半 */
-    }
-}
-
+       
         body {
             padding: 1.5rem;
             display: flex;
