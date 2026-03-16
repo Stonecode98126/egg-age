@@ -21,17 +21,31 @@
             font-family: 'Noto Sans TC', sans-serif;
         }
 
-        /* ✅ 修正：改用 pseudo-element 固定背景，相容 iOS Safari */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0;
-            width: 90%; height: 90%;
-            /* ✅ 修正：副檔名改為 .png */
-            background: url('2222.png') no-repeat center center;
-            background-size: 95% 95%;
-            z-index: -1;
-        }
+       /* ✅ 最佳推薦：針對手機版特別調整 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url('2222.png') no-repeat center center;
+    background-size: cover;  /* 桌機版維持原樣 */
+    z-index: -1;
+}
+
+/* 手機版優化 */
+@media (max-width: 768px) {
+    body::before {
+        background-size: 85% auto;  /* 手機版縮小到 85% */
+        background-position: center 20%;  /* 稍微往上移一點 */
+    }
+}
+
+/* 更小螢幕優化 */
+@media (max-width: 480px) {
+    body::before {
+        background-size: 95% auto;  /* 更小螢幕稍微放大一點 */
+    }
+}
        
         body {
             padding: 1.5rem;
