@@ -32,20 +32,7 @@ body::before {
     z-index: -1;
 }
 
-/* 手機版優化 */
-@media (max-width: 768px) {
-    body::before {
-        background-size: 85% auto;  /* 手機版縮小到 85% */
-        background-position: center 20%;  /* 稍微往上移一點 */
-    }
-}
 
-/* 更小螢幕優化 */
-@media (max-width: 480px) {
-    body::before {
-        background-size: 95% auto;  /* 更小螢幕稍微放大一點 */
-    }
-}
        
         body {
             padding: 1.5rem;
