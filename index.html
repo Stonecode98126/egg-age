@@ -99,17 +99,6 @@
         .line-btn:hover { background: #05a847; transform: scale(1.02); }
         .line-btn:active { transform: scale(0.98); }
 
-        /* LINE Share 按鈕（輪廓版，與官方帳號做區隔） */
-        .line-share-btn {
-            background: rgba(6,199,85,0.1);
-            border: 2px solid #06C755;
-            color: #04943e;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .line-share-btn:hover { background: rgba(6,199,85,0.22); transform: scale(1.02); }
-        .line-share-btn:active { transform: scale(0.98); }
-
         .divider {
             display: flex; align-items: center; gap: 0.75rem;
             color: rgba(100,100,100,0.6); font-size: 0.75rem;
@@ -209,15 +198,6 @@
                 傳送訂單到 LINE 接單小哥
             </button>
 
-            <!-- ✅ LINE Share（手動分享給個人） -->
-            <button onclick="shareToLine()"
-                class="line-share-btn w-full font-bold py-4 rounded-xl text-xl shadow-sm flex items-center justify-center gap-2">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="#04943e" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.477 2 2 6.045 2 11.077c0 2.704 1.27 5.12 3.27 6.796-.144.521-.925 3.324-.955 3.531 0 0-.017.148.079.205.096.057.208.01.208.01.274-.038 3.172-2.082 3.677-2.424.789.143 1.608.22 2.445.22 5.523 0 10-4.045 10-9.038C22 6.045 17.523 2 12 2z"/>
-                </svg>
-                手動分享給 LINE 阿澤
-            </button>
-
             <div class="divider">或</div>
 
             <!-- Email 按鈕（第二位） -->
@@ -229,7 +209,7 @@
 
             <p class="text-center text-xs text-gray-500 leading-relaxed">
                 LINE 按鈕會自動帶入訂單內容，確認後按送出即完成。<br>
-                或直接 Email 至 <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3a5b54550a0208027a5d575b535614595557">[email&#160;protected]</a></strong> 完成訂購。
+                或直接 Email 至 <strong>ano0828@gmail.com</strong> 完成訂購。
             </p>
         </section>
 
@@ -254,7 +234,7 @@
 
 <div id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
     let currentPrice = 0;
     let currentName  = "";
     let currentQty   = 1;
@@ -359,28 +339,6 @@
         localStorage.setItem(KEYS.phone, phone);
         localStorage.setItem(KEYS.email, email);
         return { name, phone, email };
-    }
-
-    /* ── LINE Share API（手動選擇好友／群組） ── */
-    function shareToLine() {
-        const data = validateForm(); if (!data) return;
-        const { name, phone, email } = data;
-        const total = currentPrice * currentQty;
-        const msg =
-            `【阿澤蛋舖 新訂單】\n` +
-            `━━━━━━━━━━━━\n` +
-            `🕐 訂購時間：${getTaiwanTime()}\n` +
-            `👤 訂購人：${name}\n` +
-            `📞 電話：${phone}\n` +
-            `📧 Email：${email}\n` +
-            `━━━━━━━━━━━━\n` +
-            `🥚 種類：${currentName}\n` +
-            `📦 盒數：${currentQty} 盒\n` +
-            `💰 總額：NT$ ${total.toLocaleString('zh-TW')}\n` +
-            `━━━━━━━━━━━━\n` +
-            `請確認後回覆客戶，謝謝！`;
-        // LINE Share API：開啟好友/群組選擇器
-        window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     /* ── LINE 傳送（第一位） ── */
