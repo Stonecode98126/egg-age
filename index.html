@@ -14,12 +14,15 @@
         }
         * { box-sizing: border-box; }
         body, html { min-height: 100%; margin: 0; font-family: 'Noto Sans TC', sans-serif; }
-        body::before {
-            content: '';
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('2222.png') no-repeat center center;
-            background-size: cover; z-index: -1;
+
+        /* ✅ 影片背景 — 取代舊的 body::before PNG */
+        #bg-video {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; z-index: -1;
+            pointer-events: none;
         }
+
         body { padding: 1.5rem; display: flex; align-items: center; justify-content: center; }
 
         .glass-panel {
@@ -57,7 +60,6 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 
-        /* 輸入欄位 */
         .input-wrap { position: relative; }
         .input-wrap input {
             width: 100%;
@@ -72,12 +74,10 @@
             box-shadow: 0 0 0 3px rgba(217,108,77,0.25);
             background: rgba(255,255,255,0.9);
         }
-        /* 已儲存：綠色邊框 */
         .input-wrap input.saved {
             border-color: #06C755;
             background: rgba(240,255,244,0.75);
         }
-        /* 清除按鈕（只在已儲存時出現） */
         .clear-btn {
             position: absolute; right: 0.55rem; top: 50%; transform: translateY(-50%);
             background: none; border: none; cursor: pointer;
@@ -87,7 +87,6 @@
         .input-wrap input.saved ~ .clear-btn { display: block; }
         .clear-btn:hover { color: #d96c4d; }
 
-        /* 已儲存提示列 */
         #save-bar {
             background: rgba(6,199,85,0.1); border: 1px solid rgba(6,199,85,0.3);
             border-radius: 0.75rem; padding: 0.6rem 1rem;
@@ -109,6 +108,11 @@
     </style>
 </head>
 <body>
+
+<!-- ✅ 影片背景，把 3333.mp4 放在同目錄即可 -->
+<video id="bg-video" autoplay loop muted playsinline>
+    <source src="3333.mp4" type="video/mp4">
+</video>
 
 <div class="glass-panel w-full max-w-xl p-6 md:p-10 overflow-y-auto" style="max-height: 92vh;">
 
@@ -165,7 +169,6 @@
         <section class="space-y-3">
             <p class="font-bold text-gray-700 text-base">● 收件資料</p>
 
-            <!-- 已儲存提示列 -->
             <div id="save-bar">
                 <span class="text-sm text-green-700 font-medium">✅ 已自動填入上次資料</span>
                 <button onclick="clearAllSaved()"
@@ -189,7 +192,6 @@
                 <button class="clear-btn" onclick="clearField('email')" title="清除此欄">✕</button>
             </div>
 
-            <!-- ✅ LINE 按鈕（第一位） -->
             <button onclick="sendToLine()"
                 class="line-btn w-full text-white font-bold py-4 rounded-xl text-xl shadow-lg flex items-center justify-center gap-2">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
@@ -200,7 +202,6 @@
 
             <div class="divider">或</div>
 
-            <!-- Email 按鈕（第二位） -->
             <button onclick="sendOrder()"
                 class="w-full text-white font-bold py-4 rounded-xl text-xl shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                 style="background: var(--accent-red);">
@@ -241,7 +242,6 @@
 
     const KEYS = { name: 'egg_name', phone: 'egg_phone', email: 'egg_email' };
 
-    /* ── 頁面載入：自動填入 ── */
     window.onload = () => {
         setQty(1);
         let anyLoaded = false;
@@ -257,7 +257,6 @@
         if (anyLoaded) document.getElementById('save-bar').classList.add('visible');
     };
 
-    /* ── 即時存入 localStorage ── */
     function onInput(field) {
         const el  = document.getElementById(field);
         const val = el.value.trim();
@@ -276,7 +275,6 @@
         document.getElementById('save-bar').classList.toggle('visible', any);
     }
 
-    /* ── 清除單一欄 ── */
     function clearField(field) {
         const el = document.getElementById(field);
         el.value = '';
@@ -285,7 +283,6 @@
         updateSaveBar();
     }
 
-    /* ── 清除全部 ── */
     function clearAllSaved() {
         ['name','phone','email'].forEach(f => {
             document.getElementById(f).value = '';
@@ -296,7 +293,6 @@
         showToast('✅ 已清除所有記憶資料');
     }
 
-    /* ── 種類 & 數量 ── */
     function selectType(id, price, name) {
         currentPrice = price; currentName = name;
         document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
@@ -312,21 +308,18 @@
         document.getElementById('total-price').textContent = (currentPrice*currentQty).toLocaleString('zh-TW');
     }
 
-    /* ── Toast ── */
     function showToast(msg) {
         const t = document.getElementById('toast');
         t.textContent = msg; t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    /* ── 台灣時間 ── */
     function getTaiwanTime() {
         const tw  = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
         const pad = n => String(n).padStart(2,'0');
         return `${tw.getFullYear()}/${pad(tw.getMonth()+1)}/${pad(tw.getDate())} ${pad(tw.getHours())}:${pad(tw.getMinutes())}`;
     }
 
-    /* ── 驗證並儲存最新值 ── */
     function validateForm() {
         const name  = document.getElementById('name').value.trim();
         const phone = document.getElementById('phone').value.trim();
@@ -334,14 +327,12 @@
         if (!currentPrice)             { showToast('⚠️ 請選擇雞蛋種類'); return null; }
         if (!name||!phone||!email)     { showToast('⚠️ 請填妥姓名、電話及 Gmail'); return null; }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('⚠️ Email 格式不正確'); return null; }
-        // 確保最新值存入
         localStorage.setItem(KEYS.name,  name);
         localStorage.setItem(KEYS.phone, phone);
         localStorage.setItem(KEYS.email, email);
         return { name, phone, email };
     }
 
-    /* ── LINE 傳送（第一位） ── */
     function sendToLine() {
         const data = validateForm(); if (!data) return;
         const { name, phone, email } = data;
@@ -362,7 +353,6 @@
         window.open(`https://line.me/R/oaMessage/@942ecqsm/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    /* ── Email 傳送（第二位） ── */
     function sendOrder() {
         const data = validateForm(); if (!data) return;
         const { name, phone, email } = data;
